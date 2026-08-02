@@ -1,219 +1,493 @@
-# 🤖 AI Interview Simulator
+# 🤖 Intervux AI
 
-> **An intelligent interview preparation platform powered by Groq AI (Llama 3.3).**  
-> Analyze resumes, practice with a real AI interviewer, and track your growth — all in one platform.
-
-🔗 **Live Demo:** [https://ai-interview-simulator-1-xp6n.onrender.com](https://ai-interview-simulator-1-xp6n.onrender.com/index.html)  
-🔧 **Backend API:** [https://ai-interview-simulator-316l.onrender.com](https://ai-interview-simulator-316l.onrender.com)
+> **An intelligent AI-powered interview preparation platform powered by Groq AI (Llama 3.3).**  
+> Analyze resumes, practice realistic AI interviews, receive personalized feedback, and track your career readiness — all in one platform.
 
 ---
 
-## ✨ Features
+# 🌐 Live Deployment
+
+🚀 **Live Application:**  
+https://intervux-ai-10.onrender.com/
+
+📂 **GitHub Repository:**  
+https://github.com/YAKSHITH684/Intervux-AI
+
+---
+
+# 📌 Project Overview
+
+Intervux AI is an AI-powered interview preparation platform designed to help students, fresh graduates, and job seekers improve their interview skills.
+
+The platform combines **Artificial Intelligence, Resume Analysis, and Mock Interview Simulation** to create a realistic interview preparation experience.
+
+Users can upload resumes, receive ATS analysis, practice AI-generated interviews, get personalized feedback, and track their improvement over time.
+
+---
+
+# 🎯 Problem Statement
+
+Many students and job seekers struggle to perform well in interviews because they lack:
+
+- Realistic interview practice
+- Personalized feedback
+- Resume optimization guidance
+- Confidence before interviews
+- Access to professional coaching
+
+Traditional preparation methods provide limited practice and do not identify individual weaknesses.
+
+Intervux AI solves this problem by providing an AI-powered personal interview coach available anytime.
+
+---
+
+# 💡 Solution
+
+Intervux AI provides an intelligent platform where candidates can:
+
+✅ Analyze their resume using AI  
+✅ Practice real-time AI mock interviews  
+✅ Receive personalized feedback  
+✅ Identify skill gaps  
+✅ Track interview readiness  
+✅ Improve confidence before real interviews  
+
+---
+
+# ✨ Features
 
 | Feature | Description |
 |---|---|
-| 📄 **Resume Intelligence** | Upload PDF/DOCX → AI gives ATS score, skills, strengths, suggestions |
-| 🤖 **AI Interviewer** | Real Groq AI interview — Technical, HR, System Design, DSA modes |
-| 🎯 **Practice Mode** | Topic-based questions with personalized AI feedback per answer |
-| 📊 **Progress Tracking** | AI resume dashboard with skill breakdown and readiness score |
-| 💬 **AI Assistant** | Floating chatbot on dashboard for instant interview tips |
-| 🔐 **User Auth** | Register, Login, Forgot Password with SQLite database |
+| 📄 Resume Intelligence | Upload PDF/DOCX/TXT resume and receive AI ATS score, skills, strengths, and suggestions |
+| 🤖 AI Interview Coach | Realistic AI interviews with Technical, HR, System Design, and DSA modes |
+| 🎯 Smart Practice Mode | Generate topic-based questions and receive personalized AI feedback |
+| 📊 Career Dashboard | Track interview readiness, skills, progress, and improvement areas |
+| 💬 AI Career Assistant | AI chatbot for interview preparation and career guidance |
+| 🔐 User Authentication | Register, login, and password recovery system |
 
 ---
 
-## 🚀 How It Works
+# 🚀 How Intervux AI Works
 
 ```
-01. Upload Resume  →  Groq AI scores ATS, extracts skills, gives suggestions
-02. Get Insights   →  Skill breakdown, strengths, gaps, readiness score
-03. Practice       →  Real AI interview with dynamic questions and feedback
-04. Track Progress →  Monitor improvement and readiness over time
+Step 1:
+User uploads resume
+
+        ↓
+
+Step 2:
+Resume parser extracts information
+
+        ↓
+
+Step 3:
+Groq AI analyzes resume
+
+        ↓
+
+Step 4:
+ATS score, skills, and suggestions generated
+
+        ↓
+
+Step 5:
+AI conducts mock interview
+
+        ↓
+
+Step 6:
+Answers are evaluated with feedback
+
+        ↓
+
+Step 7:
+Progress and readiness are tracked
 ```
 
 ---
 
-## 🛠️ Tech Stack
+# 🧠 AI Workflow
 
-### Frontend
-- HTML5, CSS3, Vanilla JavaScript
-- Glass morphism UI with background images
-- Fully responsive design
-- Hosted on **Render Static Site**
+## Resume Intelligence
 
-### Backend
-- **Python 3** + **FastAPI**
-- **SQLAlchemy** + **SQLite** for user database
-- **Groq API** (Llama 3.3-70b-versatile) for all AI features
-- **pdfplumber** + **python-docx** for resume parsing
-- Hosted on **Render Web Service**
+```
+Resume File
+      |
+      ↓
+PDF/DOCX Parser
+      |
+      ↓
+Text Extraction
+      |
+      ↓
+Groq Llama 3.3 AI
+      |
+      ↓
+ATS Score
+Skill Detection
+Strength Analysis
+Suggestions
+```
 
 ---
 
-## 🗂️ Project Structure
+## AI Interview Engine
 
 ```
-AI-Interview-Simulator/
-├── Frontend/
-│   ├── index.html              # Dashboard + floating AI assistant
-│   ├── resume.html             # Resume upload and AI analysis
-│   ├── ai_analysis.html        # Deep AI resume analysis
-│   ├── interview.html          # AI Interview Chat
-│   ├── Practice.html           # Practice mode with AI feedback
-│   ├── progress.html           # Progress tracking dashboard
-│   ├── resources.html          # Interview resources
-│   ├── 01_login.html           # Login page
-│   ├── 02_register.html        # Register page
-│   ├── 03_forgot_password.html # Forgot password
+Candidate Answer
+        |
+        ↓
+AI Interview System
+        |
+        ↓
+Response Understanding
+        |
+        ↓
+Performance Evaluation
+        |
+        ↓
+Personalized Feedback
+```
+
+---
+
+# 🤖 AI Integration
+
+Intervux AI uses:
+
+**AI Provider:** Groq API  
+**AI Model:** Llama 3.3-70B-Versatile
+
+AI powers:
+
+## 📄 Resume Analysis
+
+- Resume content extraction
+- ATS compatibility scoring
+- Skill identification
+- Strength analysis
+- Improvement recommendations
+
+
+## 🎤 AI Interview Simulation
+
+Supports:
+
+- Technical Interviews
+- HR Interviews
+- System Design Interviews
+- DSA Interviews
+
+Provides:
+
+- Dynamic questions
+- Follow-up questions
+- Answer evaluation
+- Feedback generation
+
+
+## 💬 AI Assistant
+
+Provides:
+
+- Interview preparation tips
+- Career guidance
+- Resume advice
+- Learning recommendations
+
+---
+
+# 🛠️ Technology Stack
+
+## Frontend
+
+- HTML5
+- CSS3
+- JavaScript
+- Responsive Web Design
+- Glassmorphism UI
+- Render Static Hosting
+
+
+## Backend
+
+- Python 3
+- FastAPI
+- SQLAlchemy
+- SQLite Database
+- Groq API
+- Llama 3.3 AI Model
+- pdfplumber
+- python-docx
+- REST API Architecture
+
+
+## Deployment
+
+- Render Cloud Platform
+
+---
+
+# 🗂️ Project Structure
+
+```
+Intervux-AI
+
+│
+├── Frontend
+│
+│   ├── login.html
+│   ├── register.html
+│   ├── dashboard.html
+│   ├── resume.html
+│   ├── ai_analysis.html
+│   ├── interview.html
+│   ├── practice.html
+│   ├── progress.html
+│   ├── resources.html
 │   ├── style.css
 │   └── script.js
 │
-└── Backend/
-    ├── app.py                  # FastAPI entry point
-    ├── routes.py               # All API routes with Groq AI
+│
+└── Backend
+     
+    ├── app.py
+    ├── routes.py
     ├── requirements.txt
-    └── database/
-        ├── database.py         # SQLAlchemy setup
-        └── models.py           # User model
+    │
+    └── database
+        
+        ├── database.py
+        └── models.py
 ```
 
 ---
 
-## 📡 API Endpoints
+# 📁 Local Project Location
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/register` | User registration |
-| POST | `/login` | User login |
-| POST | `/forgot-password` | Reset password |
-| POST | `/analyze-resume` | AI resume analysis (Groq) |
-| POST | `/chat` | AI interview chat (Groq) |
-| POST | `/assistant` | Dashboard AI chatbot (Groq) |
-| POST | `/practice/questions` | Generate practice questions |
-| POST | `/practice/feedback` | AI feedback on answers (Groq) |
-| POST | `/ai-analysis` | Deep resume analysis (Groq) |
+```
+C:\Users\yaksh\OneDrive\Doc\PROJECTS\Intervux-AI
+```
 
 ---
 
-## ⚙️ Local Setup
+# ⚙️ Local Installation
+
+## Clone Repository
 
 ```bash
-# Clone the repository
-git clone https://github.com/YAKSHITH684/AI-Interview-Simulator.git
-cd AI-Interview-Simulator/Backend
+git clone https://github.com/YAKSHITH684/Intervux-AI.git
+```
 
-# Install dependencies
-pip install -r requirements.txt
+Navigate into project:
 
-# Set your Groq API key
-# Windows:
-set GROQ_API_KEY=your_groq_api_key_here
-# Mac/Linux:
-export GROQ_API_KEY=your_groq_api_key_here
-
-# Run backend
-uvicorn app:app --host 0.0.0.0 --port 8000 --reload
-
-# Open Frontend/index.html in your browser
+```bash
+cd Intervux-AI
 ```
 
 ---
 
-## 🔑 Environment Variables
+# 🔧 Backend Setup
 
-| Variable | Where to Get |
+Go to backend folder:
+
+```bash
+cd Backend
+```
+
+Create virtual environment:
+
+```bash
+python -m venv venv
+```
+
+Activate environment:
+
+Windows:
+
+```bash
+venv\Scripts\activate
+```
+
+Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+# 🔑 Environment Variables
+
+Add Groq API Key:
+
+Windows:
+
+```cmd
+set GROQ_API_KEY=your_groq_api_key_here
+```
+
+Linux/Mac:
+
+```bash
+export GROQ_API_KEY=your_groq_api_key_here
+```
+
+---
+
+# ▶️ Run Backend
+
+```bash
+uvicorn app:app --reload
+```
+
+Backend runs:
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+# 🌐 Run Frontend
+
+Open another terminal:
+
+```bash
+cd Frontend
+```
+
+Start frontend:
+
+```bash
+python -m http.server 5500
+```
+
+Open browser:
+
+```
+http://localhost:5500/login.html
+```
+
+---
+
+# 📡 API Features
+
+| Endpoint | Purpose |
 |---|---|
-| `GROQ_API_KEY` | Free at [console.groq.com](https://console.groq.com) |
+| `/register` | User registration |
+| `/login` | User authentication |
+| `/forgot-password` | Password reset |
+| `/analyze-resume` | AI resume analysis |
+| `/chat` | AI interview conversation |
+| `/assistant` | AI career assistant |
+| `/practice/questions` | Generate questions |
+| `/practice/feedback` | Evaluate answers |
+| `/ai-analysis` | Resume insights |
 
 ---
 
-## 🌐 Deployment
+# ☁️ Deployment
 
-- **Frontend** → Render Static Site
-- **Backend** → Render Web Service
-- **Start Command:** `uvicorn app:app --host 0.0.0.0 --port 10000`
+## Frontend
 
----
+Platform:
 
-## 🤖 AI Integration
+```
+Render Static Site
+```
 
-All AI features are powered by **Groq API** using the **Llama 3.3-70b-versatile** model:
+Live URL:
 
-- **Resume Analysis** — reads uploaded PDF/DOCX and returns structured JSON with ATS score, skills, strengths, suggestions, skill breakdown
-- **Interview Chat** — full conversation history sent on every request for context-aware dynamic questions and feedback
-- **Practice Feedback** — evaluates candidate answers and gives specific improvement tips
-- **Dashboard Assistant** — general interview coaching chatbot with fallback knowledge base
-
----
-
-## 👨‍💻 About This Project
-
-**AI Interview Simulator** was built to solve a real problem — most students and job seekers  
-struggle with interview preparation because they lack access to realistic practice environments.
-
-This platform brings together **Artificial Intelligence, Resume Analysis, and Mock Interviews**  
-into one seamless experience, making quality interview prep accessible to everyone.
-
-**What makes it stand out:**
-- Real AI powered by **Groq Llama 3.3** — not hardcoded questions
-- Live deployed and accessible from anywhere
-- Full stack application: Python FastAPI backend + modern HTML/CSS/JS frontend
-- Supports real resume parsing from PDF, DOCX, and TXT formats
-- Interview questions dynamically adapt based on your answers
-- Built with production-level practices: REST API, database, authentication, deployment
+```
+https://intervux-ai-10.onrender.com/
+```
 
 ---
 
-
----
-
-## 📅 Project Timeline (1 Month)
-
-| Week | Phase | What Was Built |
-|---|---|---|
-| **Week 1** | Planning & Setup | Project structure, FastAPI backend setup, SQLite database, user authentication (register/login/forgot password) |
-| **Week 2** | Core Features | Resume upload & parsing (PDF/DOCX), keyword-based ATS scoring, frontend pages (dashboard, resume, progress) |
-| **Week 3** | AI Integration | Groq API integration (Llama 3.3), real AI interview chat, dynamic question generation, personalized feedback |
-| **Week 4** | Polish & Deploy | AI assistant chatbot, UI improvements, bug fixes, deployment on Render, README and documentation |
-
----
-
-## 📊 Project Statistics
+# 📊 Project Statistics
 
 | Metric | Count |
 |---|---|
-| 📁 Total Files | 20+ |
-| 💻 Frontend Pages | 10 HTML pages |
-| 🔌 API Endpoints | 9 REST endpoints |
-| 🧠 AI Features | 5 (chat, resume, analysis, practice, assistant) |
-| 🎯 Interview Modes | 4 (Technical, HR, System Design, DSA) |
-| 📝 Lines of Code | 3000+ |
-| 🗄️ Database Tables | 1 (Users) |
-| ☁️ Deployments | 2 (Frontend + Backend on Render) |
-| 🤖 AI Model | Llama 3.3-70b-versatile (Groq) |
-| 📄 Resume Formats | PDF, DOCX, TXT |
+| Total Files | 20+ |
+| Frontend Pages | 10 |
+| REST APIs | 9 |
+| AI Features | 5 |
+| Interview Modes | 4 |
+| Database | SQLite |
+| AI Model | Groq Llama 3.3-70B |
+| Resume Formats | PDF, DOCX, TXT |
+| Deployment | Render |
 
 ---
 
-## 🔮 Future Plans (Phase 2)
+# 📅 Development Timeline
 
-- [ ] Store interview history per user in database
-- [ ] Score card at end of each interview session
-- [ ] Voice interview mode (speech to text)
-- [ ] Resume builder with AI suggestions
-- [ ] Company-specific interview preparation
-- [ ] Leaderboard and ranking system
-- [ ] Email notifications and reminders
-- [ ] Mobile app version
+| Week | Work Completed |
+|---|---|
+| Week 1 | FastAPI setup, database, authentication |
+| Week 2 | Resume upload, parsing, ATS analysis |
+| Week 3 | Groq AI integration, interview engine |
+| Week 4 | UI improvements, testing, deployment |
 
-## 🤝 Contributing
+---
 
-Pull requests are welcome! For major changes, open an issue first.
+# 🌟 Why Intervux AI?
+
+Traditional interview preparation has challenges:
+
+❌ Limited practice opportunities  
+❌ No personalized feedback  
+❌ Expensive coaching  
+❌ No resume improvement guidance  
+
+
+Intervux AI provides:
+
+✅ AI-powered interview simulation  
+✅ Real-time feedback  
+✅ Resume intelligence  
+✅ Personalized preparation  
+✅ Career readiness tracking  
+
+---
+
+# 🔮 Future Enhancements
+
+- 🎙️ Voice-based AI interviews
+- 🎥 Video interview analysis
+- 📈 Interview history tracking
+- 📄 AI resume builder
+- 🏢 Company-specific interview preparation
+- 🏆 Candidate leaderboard
+- 📱 Mobile application
+- 📧 Email reminders
+
+---
+
+# 👨‍💻 Author
+
+**Yakshith Anandapu**
+
+Built with ❤️ using:
+
+```
+FastAPI
+JavaScript
+SQLite
+Groq AI
+Llama 3.3
+Render Cloud
+```
 
 ---
 
 <p align="center">
-  Made with ❤️ for placement preparation<br><br>
-  <a href="https://ai-interview-simulator-1-xp6n.onrender.com/index.html">
-    <strong>🚀 Try the Live Demo »</strong>
-  </a>
+
+# 🚀 Intervux AI
+
+### Your Personal AI Interview Coach
+
+**Prepare Smarter • Practice Better • Get Hired**
+
 </p>
