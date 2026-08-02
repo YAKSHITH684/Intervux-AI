@@ -6,7 +6,7 @@ async function uploadResume() {
     let formData = new FormData();
     formData.append("file", file);
 
-    let res = await fetch("https://ai-interview-simulator-316l.onrender.com/upload-resume", {
+    let res = await fetch("https://intervux-ai.onrender.com/upload-resume", {
         method: "POST",
         body: formData
     });
@@ -37,7 +37,7 @@ async function sendMessage() {
 
     chatBox.innerHTML += `<p><b>You:</b> ${question}</p>`;
 
-    let res = await fetch("https://ai-interview-simulator-316l.onrender.com/ask-ai", {
+    let res = await fetch("https://intervux-ai.onrender.com/ask-ai", {
         method: "POST",
         headers: {
             "Content-Type": "application/json"
