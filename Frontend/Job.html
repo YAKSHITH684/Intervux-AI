@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Match Scan — AI Interview Simulator</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --bg:            #F4FAF8;
+    --bg-elevated:   #FFFFFF;
+    --surface:       #EAF5F1;
+    --surface-2:     #DCEEE7;
+    --border:        rgba(15,42,36,0.09);
+    --border-strong: rgba(15,42,36,0.16);
+
+    --text:          #122A24;
+    --text-muted:    #52746B;
+    --text-faint:    #86A69C;
+
+    --mint:          #1FAE85;
+    --mint-deep:     #0E8A66;
+    --mint-dim:      rgba(31,174,133,0.13);
+    --sky:           #3D8BE0;
+    --sky-deep:      #2569B4;
+    --sky-dim:       rgba(61,139,224,0.13);
+    --coral:         #E0654C;
+    --coral-dim:     rgba(224,101,76,0.13);
+    --amber:         #D69A1F;
+    --amber-dim:     rgba(214,154,31,0.13);
+
+    --display: 'Fraunces', Georgia, serif;
+    --body:    'Inter', -apple-system, sans-serif;
+    --mono:    'JetBrains Mono', 'Courier New', monospace;
+}
+
+*{ box-sizing:border-box; margin:0; padding:0; }
+
+body{
+    font-family:var(--body);
+    color:var(--text);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:40px 20px;
+    -webkit-font-smoothing:antialiased;
+    background:var(--bg);
+}
+body::before{
+    content:"";
+    position:fixed; inset:0; z-index:-1;
+    background:
+        radial-gradient(ellipse 900px 500px at 18% -5%, rgba(31,174,133,0.12), transparent 60%),
+        radial-gradient(ellipse 700px 500px at 100% 20%, rgba(61,139,224,0.12), transparent 60%),
+        var(--bg);
+}
+
+::selection{ background:var(--mint); color:#fff; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible{ outline:2px solid var(--sky-deep); outline-offset:3px; }
+
+.page{ width:100%; max-width:600px; }
+
+.eyebrow{
+    font-family:var(--mono);
+    font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--mint-deep);
+    display:inline-flex; align-items:center; gap:8px;
+    margin-bottom:10px;
+}
+.eyebrow::before{ content:""; width:5px; height:5px; border-radius:50%; background:var(--mint); box-shadow:0 0 8px rgba(31,174,133,0.5); }
+
+.container {
+  background: var(--bg-elevated);
+  border-radius: 22px;
+  border: 1px solid var(--border-strong);
+  padding: 34px;
+  box-shadow: 0 24px 56px rgba(15,42,36,0.12);
+}
+
+h2 {
+    font-family:var(--display); font-weight:600; font-size:24px;
+    display:flex; align-items:center; gap:12px; margin-bottom:6px;
+}
+h2 .icon-badge{
+    width:42px; height:42px; border-radius:12px; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:var(--mint-dim); border:1px solid rgba(31,174,133,0.3);
+    font-size:19px;
+}
+.subtext{ color:var(--text-muted); font-size:13.5px; margin-bottom:24px; }
+
+.field-label{
+    font-family:var(--mono); font-size: 11px; font-weight: 600; color: var(--mint-deep);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.field-label span.count{ color:var(--text-faint); text-transform:none; letter-spacing:0; font-weight:500; }
+
+.upload-area {
+  border: 2px dashed var(--border-strong);
+  border-radius: 14px;
+  padding: 22px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: .25s ease;
+  margin-bottom: 6px;
+  background: var(--surface);
+}
+.upload-area:hover { border-color: var(--sky-deep); background: var(--sky-dim); }
+.upload-area input { display:none; }
+.upload-area .emoji{ font-size:1.7rem; margin-bottom:4px; }
+.upload-area p { color: var(--text-muted); font-size:13.5px; margin-top:4px; }
+.upload-area p.hint{ color: var(--text-faint); font-size:12px; }
+
+#fileName{
+    text-align:center; font-family:var(--mono); font-size:12.5px;
+    color:var(--mint-deep); margin-bottom:8px; min-height:18px;
+}
+
+.mode-switch{
+    display:flex; justify-content:center; gap:6px;
+    margin-bottom:14px;
+}
+.mode-switch button{
+    width:auto; margin:0; padding:6px 12px;
+    font-size:11.5px; font-weight:600; font-family:var(--mono);
+    border-radius:999px; border:1px solid var(--border-strong);
+    background:transparent; color:var(--text-muted);
+}
+.mode-switch button.active{
+    background:var(--mint-dim); color:var(--mint-deep); border-color:rgba(31,174,133,0.35);
+}
+
+textarea{
+    width:100%;
+    font-family:var(--body);
+    font-size:13.5px;
+    line-height:1.55;
+    color:var(--text);
+    background:var(--surface);
+    border:1px solid var(--border-strong);
+    border-radius:14px;
+    padding:14px;
+    resize:vertical;
+    min-height:120px;
+    margin-bottom:6px;
+}
+textarea::placeholder{ color:var(--text-faint); }
+
+button {
+  width: 100%;
+  padding: 13px;
+  border: none;
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 14.5px;
+  cursor: pointer;
+  transition: .25s ease;
+  margin-bottom: 10px;
+  font-family:var(--body);
+}
+#analyzeBtn{
+  background: linear-gradient(135deg, var(--mint-deep), var(--sky-deep));
+  color: #fff;
+  box-shadow: 0 10px 26px rgba(14,138,102,0.28);
+  margin-top: 8px;
+}
+#analyzeBtn:hover { transform: translateY(-2px); box-shadow:0 14px 32px rgba(14,138,102,0.36); }
+#analyzeBtn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow:none; }
+
+.back-btn {
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--text-muted);
+}
+.back-btn:hover { background: var(--surface); color: var(--text); border-color:var(--border-strong); }
+
+.result { display:none; margin-top:22px; }
+
+.score-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+.score-box {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 16px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.score-box .val { font-family:var(--display); font-size: 26px; font-weight: 700; }
+.score-box .lbl { font-family:var(--mono); font-size: 10.5px; color: var(--text-faint); margin-top: 4px; text-transform:uppercase; letter-spacing:.05em; }
+
+.section {
+  background: var(--surface);
+  border-radius: 14px;
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+}
+.section-title {
+    font-family:var(--mono); font-size: 11px; font-weight: 600; color: var(--mint-deep);
+    text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 12px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 5px 12px;
+  margin: 3px;
+  border-radius: 999px;
+  background: var(--sky-dim);
+  color: var(--sky-deep);
+  font-size: 12px;
+  font-weight:500;
+  border: 1px solid rgba(61,139,224,0.28);
+}
+.badge.gap{
+  background: var(--coral-dim);
+  color: var(--coral);
+  border: 1px solid rgba(224,101,76,0.28);
+}
+
+.verdict {
+  padding: 11px 14px;
+  border-radius: 11px;
+  font-weight: 700;
+  font-size: 14px;
+  text-align: center;
+  margin-bottom: 14px;
+}
+.verdict.strong   { background: var(--mint-dim);  color: var(--mint-deep);  border: 1px solid rgba(31,174,133,0.3); }
+.verdict.moderate { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(214,154,31,0.3); }
+.verdict.weak      { background: var(--coral-dim); color: var(--coral); border: 1px solid rgba(224,101,76,0.3); }
+
+.list-item { display:flex; gap:9px; align-items:flex-start; font-size:13px; margin-bottom:8px; color:var(--text); line-height:1.5; }
+.list-item:last-child{ margin-bottom:0; }
+.list-item .icon { flex-shrink:0; font-weight:700; }
+
+.bar-row { display:flex; align-items:center; gap:10px; margin-bottom:10px; }
+.bar-row:last-child{ margin-bottom:0; }
+.bar-lbl { width: 132px; font-size: 12px; color: var(--text-muted); flex-shrink:0; }
+.bar-track { flex:1; height:8px; background:var(--surface-2); border-radius:999px; overflow:hidden; }
+.bar-fill { height:100%; border-radius:999px; background:linear-gradient(90deg, var(--mint), var(--sky)); transition:width 1s ease; }
+.bar-val { width:36px; text-align:right; font-family:var(--mono); font-size:12px; font-weight:600; color:var(--sky-deep); }
+
+.spinner {
+    width:28px; height:28px; border:3px solid var(--border-strong);
+    border-top-color: var(--mint-deep); border-radius:50%;
+    animation:spin 0.8s linear infinite; margin:0 auto;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+.loading { text-align:center; padding:26px 10px; }
+.loading p { margin-top:12px; color:var(--text-muted); font-size:13px; font-family:var(--mono); }
+
+.summary-text{ font-size:13px; line-height:1.7; color:var(--text-muted); }
+
+.cta-link{
+    display:block; text-align:center; padding:13px;
+    background:linear-gradient(135deg, var(--mint-deep), var(--sky-deep));
+    border-radius:12px; color:#fff; font-weight:700; text-decoration:none;
+    margin-top:6px; font-size:14px;
+    box-shadow:0 10px 26px rgba(14,138,102,0.25);
+    transition:transform .2s ease;
+}
+.cta-link:hover{ transform:translateY(-2px); }
+
+.error-msg{ text-align:center; padding:22px; color:var(--coral); font-size:13.5px; font-weight:500; }
+
+@media (max-width:600px){
+    .container{ padding:24px; }
+    .score-row{ gap:8px; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="container">
+    <span class="eyebrow">AI-Powered</span>
+    <h2>
+      <span class="icon-badge">🎯</span>
+      Job Match Scan
+    </h2>
+    <p class="subtext">Compare your resume against a job description — get a match score, overlapping and missing keywords, and what to fix before you apply.</p>
+
+    <div class="field-label">Resume</div>
+    <div class="mode-switch">
+      <button type="button" class="active" id="modeUpload" onclick="setMode('upload')">📎 Upload file</button>
+      <button type="button" id="modePaste" onclick="setMode('paste')">✍️ Paste text</button>
+    </div>
+
+    <div class="upload-area" id="dropZone" onclick="document.getElementById('resumeFile').click()">
+      <div class="emoji">📄</div>
+      <p>Click to upload your resume</p>
+      <p class="hint">Supports PDF, DOCX, TXT</p>
+      <input type="file" id="resumeFile" accept=".pdf,.docx,.txt" onchange="handleFile(this)">
+    </div>
+    <div id="fileName"></div>
+
+    <textarea id="resumeText" placeholder="Paste your resume text here..." style="display:none;"></textarea>
+
+    <div class="field-label" style="margin-top:14px;">
+      Job Description
+      <span class="count" id="jdCount">0 words</span>
+    </div>
+    <textarea id="jdText" placeholder="Paste the job description here..." oninput="document.getElementById('jdCount').textContent = wordCount(this.value) + ' words'"></textarea>
+
+    <button id="analyzeBtn" onclick="matchJob()">⚡ Run Match Scan</button>
+
+    <div class="result" id="result">
+      <div id="resultContent"></div>
+    </div>
+
+    <button class="back-btn" onclick="window.location.href='index.html'">← Back</button>
+  </div>
+
+</div>
+
+<script>
+const BACKEND = "https://ai-interview-simulator-316l.onrender.com";
+
+let mode = "upload";
+
+function setMode(next){
+  mode = next;
+  document.getElementById('modeUpload').classList.toggle('active', mode === 'upload');
+  document.getElementById('modePaste').classList.toggle('active', mode === 'paste');
+  document.getElementById('dropZone').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById('fileName').style.display = mode === 'upload' ? 'block' : 'none';
+  document.getElementById('resumeText').style.display = mode === 'paste' ? 'block' : 'none';
+}
+
+function wordCount(str){ return (str.trim().match(/\S+/g) || []).length; }
+
+function handleFile(input) {
+  const file = input.files[0];
+  if (file) document.getElementById('fileName').textContent = '📎 ' + file.name;
+}
+
+async function matchJob() {
+  const jd = document.getElementById("jdText").value.trim();
+  const file = document.getElementById("resumeFile").files[0];
+  const resumeTextVal = document.getElementById("resumeText").value.trim();
+
+  if (!jd) { alert("Please paste a job description first"); return; }
+  if (mode === "upload" && !file) { alert("Please select a resume file first"); return; }
+  if (mode === "paste" && !resumeTextVal) { alert("Please paste your resume text first"); return; }
+
+  const btn = document.getElementById("analyzeBtn");
+  const result = document.getElementById("result");
+  const content = document.getElementById("resultContent");
+
+  btn.disabled = true;
+  btn.textContent = "Scanning...";
+  result.style.display = "block";
+  content.innerHTML = `<div class="loading"><div class="spinner"></div><p>AI is comparing your resume to the role...</p></div>`;
+
+  try {
+    let res;
+    if (mode === "upload") {
+      const formData = new FormData();
+      formData.append("resume", file);
+      formData.append("job_description", jd);
+      res = await fetch(`${BACKEND}/match-job-file`, { method: "POST", body: formData });
+    } else {
+      res = await fetch(`${BACKEND}/match-job`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ resume_text: resumeTextVal, job_description: jd })
+      });
+    }
+    const data = await res.json();
+
+    if (data.success === false) {
+      content.innerHTML = `<div class="error-msg">${data.error || "Something went wrong during the scan."}</div>`;
+      return;
+    }
+
+    const score = data.match_score ?? 0;
+    const verdictClass = score >= 70 ? "strong" : score >= 40 ? "moderate" : "weak";
+    const verdict = data.verdict || (verdictClass === "strong" ? "Strong Match" : verdictClass === "moderate" ? "Moderate Match" : "Weak Match");
+
+    const breakdown = data.category_breakdown || {};
+    const barsHTML = Object.entries(breakdown).map(([k,v]) => `
+      <div class="bar-row">
+        <span class="bar-lbl">${k}</span>
+        <div class="bar-track"><div class="bar-fill" style="width:${v}%"></div></div>
+        <span class="bar-val">${v}%</span>
+      </div>`).join('');
+
+    const matched = data.matched_skills || [];
+    const missing = data.missing_skills || [];
+    const suggestions = data.suggestions || [];
+
+    content.innerHTML = `
+      <div class="score-row">
+        <div class="score-box"><div class="val" style="color:var(--mint-deep)">${score}%</div><div class="lbl">Match Score</div></div>
+        <div class="score-box"><div class="val" style="color:var(--sky-deep)">${data.ats_score ?? '--'}%</div><div class="lbl">ATS Score</div></div>
+      </div>
+
+      <div class="verdict ${verdictClass}">${verdict}</div>
+
+      ${data.summary ? `
+      <div class="section">
+        <div class="section-title">Summary</div>
+        <p class="summary-text">${data.summary}</p>
+      </div>` : ''}
+
+      <div class="section">
+        <div class="section-title">Matched Keywords (${matched.length})</div>
+        ${matched.map(s => `<span class="badge">${s}</span>`).join('') || '<p style="font-size:13px;color:var(--text-faint);">No overlapping keywords found</p>'}
+      </div>
+
+      <div class="section">
+        <div class="section-title">Missing From Your Resume (${missing.length})</div>
+        ${missing.map(s => `<span class="badge gap">${s}</span>`).join('') || '<p style="font-size:13px;color:var(--text-faint);">Nothing missing — great coverage</p>'}
+      </div>
+
+      ${barsHTML ? `<div class="section"><div class="section-title">Category Breakdown</div>${barsHTML}</div>` : ''}
+
+      ${suggestions.length ? `
+      <div class="section">
+        <div class="section-title">Suggestions to Improve</div>
+        ${suggestions.map(s => `<div class="list-item"><span class="icon" style="color:var(--amber)">→</span><span>${s}</span></div>`).join('')}
+      </div>` : ''}
+
+      <a href="interview.html" class="cta-link">🎙️ Start Interview Now</a>
+    `;
+  } catch (e) {
+    content.innerHTML = `<div class="error-msg">Error running the match scan. Please try again.</div>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "⚡ Run Match Scan";
+  }
+}
+</script>
+</body>
+</html>

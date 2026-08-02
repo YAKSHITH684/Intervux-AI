@@ -1,11 +1,12 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Form
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import random
 import os
 import json
 import requests
+import re
 
 from database.database import SessionLocal
 from database.models import User
@@ -651,3 +652,162 @@ Schema:
         except Exception as e:
             return {"success": False, "error": f"Parse error: {e}"}
     return {"success": False, "error": "Groq unavailable"}
+
+
+# ─────────────────────────────────────────
+# JOB DESCRIPTION MATCHING
+# ─────────────────────────────────────────
+# Shared keyword bank used by the fallback matcher (kept broader than the
+# analyze-resume skill_map since job descriptions mention tools/soft skills
+# that resumes don't always phrase the same way).
+MATCH_SKILLS_DB = [
+    "python", "java", "c++", "c#", "javascript", "typescript", "go", "rust",
+    "sql", "nosql", "mongodb", "postgresql", "mysql", "redis",
+    "machine learning", "deep learning", "nlp", "computer vision",
+    "tensorflow", "pytorch", "scikit-learn", "pandas", "numpy",
+    "django", "flask", "fastapi", "spring", "node.js", "express",
+    "react", "angular", "vue", "html", "css", "tailwind",
+    "docker", "kubernetes", "aws", "azure", "gcp", "ci/cd", "jenkins",
+    "git", "github", "linux", "rest api", "graphql", "microservices",
+    "agile", "scrum", "communication", "leadership", "problem solving",
+    "teamwork", "data structures", "algorithms", "system design",
+    "testing", "unit testing", "debugging", "excel", "tableau", "power bi",
+]
+
+
+def _extract_keywords(text: str) -> set:
+    text_lower = text.lower()
+    return {kw for kw in MATCH_SKILLS_DB if kw in text_lower}
+
+
+class JobMatchRequest(BaseModel):
+    resume_text: str
+    job_description: str
+
+
+def _fallback_job_match(resume_text: str, job_description: str) -> dict:
+    resume_kw = _extract_keywords(resume_text)
+    jd_kw = _extract_keywords(job_description)
+
+    matched = sorted(resume_kw & jd_kw)
+    missing = sorted(jd_kw - resume_kw)
+
+    match_score = round((len(matched) / len(jd_kw)) * 100) if jd_kw else 50
+
+    # crude keyword-density proxy for the two other headline numbers
+    resume_words = re.findall(r"[a-zA-Z]+", resume_text.lower())
+    jd_words = re.findall(r"[a-zA-Z]+", job_description.lower())
+    overlap_words = set(resume_words) & set(jd_words)
+    ats_score = min(round(match_score * 0.8 + len(overlap_words) / 5), 100)
+
+    suggestions = []
+    if missing:
+        suggestions.append(f"Add these missing keywords if genuinely applicable: {', '.join(missing[:6])}")
+    if len(matched) < 3:
+        suggestions.append("Mirror more of the job description's language in your skills/experience sections")
+    if "project" not in resume_text.lower():
+        suggestions.append("Add project details that relate directly to this role")
+    if not suggestions:
+        suggestions.append("Strong overlap with this role — tailor your summary line to reinforce it")
+
+    verdict = (
+        "Strong Match" if match_score >= 70 else
+        "Moderate Match" if match_score >= 40 else
+        "Weak Match"
+    )
+
+    return {
+        "success": True,
+        "match_score": match_score,
+        "ats_score": ats_score,
+        "verdict": verdict,
+        "matched_skills": matched,
+        "missing_skills": missing,
+        "summary": f"{len(matched)} of {len(jd_kw) or 1} keywords from the job description were found in the resume.",
+        "suggestions": suggestions[:4],
+        "category_breakdown": {
+            "Skills Match": match_score,
+            "Keyword Coverage": ats_score,
+            "Experience Relevance": 60 if "experience" in resume_text.lower() else 40,
+            "Project Relevance": 65 if "project" in resume_text.lower() else 35,
+        },
+    }
+
+
+@router.post("/match-job")
+def match_job(data: JobMatchRequest):
+    """Compares a resume against a job description and returns a match score,
+    matched/missing keywords, and tailored suggestions. Tries Groq first,
+    falls back to keyword-overlap scoring if the AI call fails."""
+    import json as _json
+
+    system = """You are an expert ATS and recruiting analyst. Compare the resume to the job description and respond ONLY with valid JSON, no markdown, no explanation.
+Schema:
+{
+  "match_score": integer 0-100,
+  "ats_score": integer 0-100,
+  "verdict": "Strong Match / Moderate Match / Weak Match",
+  "matched_skills": ["skill1", "skill2"],
+  "missing_skills": ["skill1", "skill2"],
+  "summary": "2-3 sentence summary of fit",
+  "suggestions": ["s1","s2","s3","s4"],
+  "category_breakdown": {
+    "Skills Match": integer,
+    "Keyword Coverage": integer,
+    "Experience Relevance": integer,
+    "Project Relevance": integer
+  }
+}"""
+
+    user_content = (
+        f"RESUME:\n{data.resume_text[:3500]}\n\n"
+        f"JOB DESCRIPTION:\n{data.job_description[:2000]}"
+    )
+
+    ai_reply = ask_groq(system, [{"role": "user", "content": user_content}], max_tokens=1000)
+    if ai_reply:
+        try:
+            clean = ai_reply.replace("```json", "").replace("```", "").strip()
+            result = _json.loads(clean)
+            return {"success": True, **result}
+        except Exception as e:
+            print(f"Groq JSON parse error (match-job): {e}")
+
+    return _fallback_job_match(data.resume_text, data.job_description)
+
+
+@router.post("/match-job-file")
+async def match_job_file(
+    resume: UploadFile = File(...),
+    job_description: str = Form(...),
+):
+    """Same as /match-job but accepts a resume file (PDF/DOCX/TXT) instead of raw text."""
+    import pdfplumber
+    import docx as python_docx
+
+    content = await resume.read()
+    filename = resume.filename.lower()
+    text = ""
+
+    if filename.endswith(".pdf"):
+        with open("temp_match.pdf", "wb") as f:
+            f.write(content)
+        with pdfplumber.open("temp_match.pdf") as pdf:
+            for page in pdf.pages:
+                text += page.extract_text() or ""
+    elif filename.endswith(".docx"):
+        with open("temp_match.docx", "wb") as f:
+            f.write(content)
+        doc = python_docx.Document("temp_match.docx")
+        for para in doc.paragraphs:
+            text += para.text + " "
+    else:
+        try:
+            text = content.decode("utf-8", errors="ignore")
+        except Exception:
+            text = ""
+
+    if not text.strip():
+        return {"success": False, "error": "Could not extract text from resume file"}
+
+    return match_job(JobMatchRequest(resume_text=text, job_description=job_description))
