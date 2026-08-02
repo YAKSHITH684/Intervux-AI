@@ -421,17 +421,6 @@ https://intervux-ai-10.onrender.com/
 
 ---
 
-# 📅 Development Timeline
-
-| Week | Work Completed |
-|---|---|
-| Week 1 | FastAPI setup, database, authentication |
-| Week 2 | Resume upload, parsing, ATS analysis |
-| Week 3 | Groq AI integration, interview engine |
-| Week 4 | UI improvements, testing, deployment |
-
----
-
 # 🌟 Why Intervux AI?
 
 Traditional interview preparation has challenges:
