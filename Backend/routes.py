@@ -100,14 +100,17 @@ def ping():
 
 
 # TEMPORARY DEBUG ROUTE — remove after confirming the key loads.
-# Never returns the actual key value, just whether it's present and its length.
+# Never returns actual values, just key names and lengths — to catch typos/case issues.
 @router.get("/debug-env")
 def debug_env():
     key = os.getenv("GROQ_API_KEY")
+    groq_like_keys = [k for k in os.environ.keys() if "groq" in k.lower()]
     return {
         "key_found": key is not None,
         "key_length": len(key) if key else 0,
-        "key_prefix": key[:5] if key else None
+        "key_prefix": key[:5] if key else None,
+        "groq_like_env_var_names": groq_like_keys,
+        "total_env_vars_set": len(os.environ)
     }
 
 
