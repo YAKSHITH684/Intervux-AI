@@ -749,6 +749,76 @@ def _fallback_job_match(resume_text: str, job_description: str) -> dict:
     }
 
 
+# ─────────────────────────────────────────
+# SKILL GAP DETECTION
+# ─────────────────────────────────────────
+class SkillGapRequest(BaseModel):
+    job_role: str
+    experience_level: str = "fresher"
+    current_skills: str
+
+FALLBACK_SKILL_GAP_ROADMAP = [
+    {"step": 1, "skill": "Core fundamentals for the role", "reason": "Strong basics make every later topic easier to pick up.", "resource": "freeCodeCamp / official docs"},
+    {"step": 2, "skill": "A portfolio project", "reason": "Recruiters weigh practical proof over just listed skills.", "resource": "Build and deploy something small end-to-end"},
+    {"step": 3, "skill": "Mock interviews", "reason": "Practicing out loud closes the gap between knowing and explaining.", "resource": "Intervux mock interview mode"},
+]
+
+def _fallback_skill_gap(current_skills: str) -> dict:
+    have = [s.strip() for s in current_skills.split(",") if s.strip()][:12]
+    return {
+        "match_percentage": 50,
+        "skills_you_have": have,
+        "skills_you_miss": [],
+        "priority_skills_to_learn": ["Practice with real projects", "Review core fundamentals for the role"],
+        "category_scores": {"Technical Skills": 50, "Tools & Frameworks": 50, "Domain Knowledge": 50, "Soft Skills": 50},
+        "learning_roadmap": FALLBACK_SKILL_GAP_ROADMAP,
+        "summary": "AI analysis is temporarily unavailable, so this is a placeholder estimate — try again shortly for a personalized breakdown."
+    }
+
+@router.post("/skill-gap")
+def skill_gap(data: SkillGapRequest):
+    """Dedicated skill-gap analysis endpoint — uses a strict JSON-only system prompt
+    and a generous token budget so the full roadmap/schema never gets truncated
+    (unlike reusing the conversational /assistant endpoint)."""
+    import json as _json
+
+    system = """You are an expert career counselor and technical recruiter. Respond ONLY with valid JSON, no markdown, no explanation, no text before or after the JSON object.
+Schema:
+{
+  "match_percentage": integer 0-100,
+  "skills_you_have": ["skill1","skill2"],
+  "skills_you_miss": ["skill1","skill2"],
+  "priority_skills_to_learn": ["skill1","skill2","skill3"],
+  "category_scores": {"Technical Skills": integer, "Tools & Frameworks": integer, "Domain Knowledge": integer, "Soft Skills": integer},
+  "learning_roadmap": [
+    {"step":1,"skill":"name","reason":"why","resource":"where to learn"},
+    {"step":2,"skill":"name","reason":"why","resource":"where to learn"},
+    {"step":3,"skill":"name","reason":"why","resource":"where to learn"}
+  ],
+  "summary": "2-3 sentence assessment"
+}"""
+
+    user_content = (
+        f"Target Job Role: {data.job_role}\n"
+        f"Experience Level: {data.experience_level}\n"
+        f"Current Skills: {data.current_skills}"
+    )
+
+    ai_reply = ask_groq(system, [{"role": "user", "content": user_content}], max_tokens=1200)
+    if ai_reply:
+        try:
+            clean = ai_reply.replace("```json", "").replace("```", "").strip()
+            jstart, jend = clean.find("{"), clean.rfind("}")
+            if jstart != -1 and jend != -1 and jend > jstart:
+                clean = clean[jstart:jend + 1]
+            result = _json.loads(clean)
+            return {"success": True, **result}
+        except Exception as e:
+            print(f"Groq JSON parse error (skill-gap): {e}")
+
+    return {"success": False, **_fallback_skill_gap(data.current_skills)}
+
+
 @router.post("/match-job")
 def match_job(data: JobMatchRequest):
     """Compares a resume against a job description and returns a match score,

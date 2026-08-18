@@ -13,7 +13,7 @@
 ═══════════════════════════════════════ -->
 <script>
 (function warmBackend() {
-  fetch("https://intervux-ai.onrender.com/ping").catch(function () {});
+  fetch("https://intervux-ai-10.onrender.com/ping").catch(function () {});
 })();
 </script>
 
@@ -261,45 +261,17 @@ async function analyzeGap() {
     content.innerHTML = `<div class="loading"><div class="spinner"></div><p>Groq AI is detecting skill gaps for ${jobRole}...</p></div>`;
 
     try {
-        const prompt = `You are an expert career counselor and technical recruiter.
-Analyze the skill gap for:
-- Target Job Role: ${jobRole}
-- Experience Level: ${expLevel}
-- Current Skills: ${resumeText}
-
-Respond ONLY with valid JSON, no markdown:
-{
-  "match_percentage": integer 0-100,
-  "skills_you_have": ["skill1","skill2"],
-  "skills_you_miss": ["skill1","skill2"],
-  "priority_skills_to_learn": ["skill1","skill2","skill3"],
-  "category_scores": {"Technical Skills": integer, "Tools & Frameworks": integer, "Domain Knowledge": integer, "Soft Skills": integer},
-  "learning_roadmap": [
-    {"step":1,"skill":"name","reason":"why","resource":"where to learn"},
-    {"step":2,"skill":"name","reason":"why","resource":"where to learn"},
-    {"step":3,"skill":"name","reason":"why","resource":"where to learn"}
-  ],
-  "summary": "2-3 sentence assessment"
-}`;
-
-        const res = await fetch(`${BACKEND}/assistant`, {
+        const res = await fetch(`${BACKEND}/skill-gap`, {
             method:"POST", headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({ message: prompt, history: [] })
+            body: JSON.stringify({
+                job_role: jobRole,
+                experience_level: expLevel,
+                current_skills: resumeText
+            })
         });
-        const data = await res.json();
+        const analysis = await res.json();
 
-        let analysis;
-        try {
-            let clean = data.reply.replace(/```json/g,"").replace(/```/g,"").trim();
-            // The assistant endpoint uses a conversational system prompt, so the model
-            // sometimes wraps the JSON in a sentence or two. Pull out just the {...} block.
-            const jsonStart = clean.indexOf("{");
-            const jsonEnd = clean.lastIndexOf("}");
-            if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
-                clean = clean.slice(jsonStart, jsonEnd + 1);
-            }
-            analysis = JSON.parse(clean);
-        } catch(e) {
+        if (!analysis || analysis.success === false && !analysis.match_percentage) {
             content.innerHTML = `<div style="padding:20px;color:var(--coral);text-align:center;">AI response could not be parsed. Please try again.</div>`;
             return;
         }
