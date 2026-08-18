@@ -10,10 +10,17 @@
      with everything else, so Render's container
      + Groq connection are already awake by the
      time "Generate AI Career Roadmap" is clicked.
+
+     FIX: this now pings the SAME backend that
+     /assistant actually runs on. Previously this
+     warmed "intervux-ai-10.onrender.com" while the
+     real call went to "intervux-ai.onrender.com" —
+     two different Render services — so the real
+     backend was always cold on first request.
 ═══════════════════════════════════════ -->
 <script>
 (function warmBackend() {
-  fetch("https://intervux-ai-10.onrender.com/ping").catch(function () {});
+  fetch("https://intervux-ai.onrender.com/ping").catch(function () {});
 })();
 </script>
 
@@ -135,6 +142,11 @@ select option{ background:#0A0F17; color:var(--text); }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 .loading{ text-align:center; padding:32px; }
 .loading p{ margin-top:12px; font-size:13px; color:var(--text-faint); font-family:var(--mono); }
+
+.err-box{ padding:24px; text-align:center; }
+.err-box p.msg{ color:var(--coral); margin-bottom:6px; font-size:14px; }
+.err-box p.hint{ color:var(--text-faint); font-size:12px; margin-bottom:16px; font-family:var(--mono); }
+.err-box button{ width:auto; padding:10px 20px; }
 </style>
 </head>
 <body>
@@ -213,6 +225,7 @@ select option{ background:#0A0F17; color:var(--text); }
 
 <script>
 const BACKEND = "https://intervux-ai.onrender.com";
+const REQUEST_TIMEOUT_MS = 55000; // Render free-tier cold starts can take ~30-50s
 let lastRoadmap = null;
 
 function quickFill(role) {
@@ -281,6 +294,11 @@ function closeTruncatedJSON(str) {
     let result = str;
     if (inString) result += '"';           // finish an unterminated string
     result = result.replace(/,\s*$/, "");  // drop a trailing comma left dangling
+
+    // If the string ends right after a key's colon, or after a dangling key
+    // with no value at all, that's unrecoverable structurally — but we still
+    // attempt bracket closure so JSON.parse gives a clean failure rather than
+    // silently producing garbage.
     for (let i = stack.length - 1; i >= 0; i--) {
         result += stack[i] === "{" ? "}" : "]";
     }
@@ -294,6 +312,24 @@ function matchSkills(list, haveArr) {
             ? `<span class="badge badge-have">✓ ${skill}</span>`
             : `<span class="badge badge-skill">${skill}</span>`;
     }).join('');
+}
+
+// fetch wrapper with a timeout, so a hung cold-start doesn't spin forever
+function fetchWithTimeout(url, options, timeoutMs) {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeoutMs);
+    return fetch(url, { ...options, signal: controller.signal })
+        .finally(() => clearTimeout(id));
+}
+
+function showError(message, hint) {
+    const content = document.getElementById("resultContent");
+    content.innerHTML = `
+        <div class="err-box">
+            <p class="msg">${message}</p>
+            ${hint ? `<p class="hint">${hint}</p>` : ''}
+            <button class="btn-primary" onclick="generateRoadmap()">↻ Try Again</button>
+        </div>`;
 }
 
 async function generateRoadmap() {
@@ -317,6 +353,9 @@ async function generateRoadmap() {
     }, 7000);
 
     try {
+        // Kept deliberately compact: fewer core_skills per stage means a
+        // shorter completion, which means far less chance of the response
+        // getting cut off mid-JSON on a slow/cold backend.
         const prompt = `You are an expert career counselor who has mapped career paths for thousands of professionals across every tech and non-tech job role.
 
 Build a concise career roadmap for:
@@ -325,7 +364,7 @@ Build a concise career roadmap for:
 
 The roadmap must work for ANY job role given (technical, creative, business, healthcare, etc.), not just software jobs.
 
-Keep every text field SHORT (see word limits below) so the full response stays compact, EXCEPT core_skills — for each stage, list up to 10 core_skills (fewer only if the role genuinely doesn't need that many), ordered most-important first, using short skill names (1-3 words each). Output ONLY the JSON object below, with no markdown fences, no preamble, and no text after it. The JSON must be complete and syntactically valid — do not stop partway through.
+Keep every text field SHORT (see word limits below) so the full response stays compact. For each stage, list up to 6 core_skills (fewer only if the role genuinely doesn't need that many), ordered most-important first, using short skill names (1-3 words each). Output ONLY the JSON object below, with no markdown fences, no preamble, and no text after it. The JSON must be complete and syntactically valid — do not stop partway through, and keep the ENTIRE response under 1800 words.
 
 {
   "role": "${jobRole}",
@@ -340,7 +379,7 @@ Keep every text field SHORT (see word limits below) so the full response stays c
       "stage": "Entry Level",
       "timeframe": "e.g. 0-1 years",
       "avg_salary": "short approximate range for the given region, or global estimate if none given",
-      "core_skills": ["skill1","skill2","skill3","skill4","skill5","skill6","skill7","skill8","skill9","skill10"],
+      "core_skills": ["skill1","skill2","skill3","skill4","skill5","skill6"],
       "tools": ["tool1","tool2"],
       "certifications": ["cert1"],
       "milestone": "max 1 sentence: how to know you're ready for the next stage"
@@ -359,10 +398,10 @@ Keep every text field SHORT (see word limits below) so the full response stays c
 
 Limit "learning_resources" to at most 3 items total. Do not add any keys beyond what's shown above.`;
 
-        const res = await fetch(`${BACKEND}/assistant`, {
+        const res = await fetchWithTimeout(`${BACKEND}/assistant`, {
             method:"POST", headers:{"Content-Type":"application/json"},
             body: JSON.stringify({ message: prompt, history: [] })
-        });
+        }, REQUEST_TIMEOUT_MS);
 
         if (!res.ok) {
             throw new Error(`Server responded with status ${res.status}`);
@@ -373,11 +412,10 @@ Limit "learning_resources" to at most 3 items total. Do not add any keys beyond 
         const roadmap = parseRoadmapJSON(data.reply);
         if (!roadmap) {
             console.error("Raw AI reply that failed to parse:", data.reply);
-            content.innerHTML = `
-                <div style="padding:24px;color:var(--coral);text-align:center;">
-                    <p style="margin-bottom:14px;">The AI response couldn't be read this time. This usually clears up on a retry.</p>
-                    <button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="generateRoadmap()">↻ Try Again</button>
-                </div>`;
+            showError(
+                "The AI response couldn't be read this time.",
+                "This usually means the reply was cut off or malformed — often a cold-start or token-limit issue on the backend. Retrying almost always fixes it."
+            );
             return;
         }
 
@@ -453,11 +491,17 @@ Limit "learning_resources" to at most 3 items total. Do not add any keys beyond 
 
     } catch(e) {
         console.error("Roadmap generation failed:", e);
-        content.innerHTML = `
-            <div style="padding:24px;color:var(--coral);text-align:center;">
-                <p style="margin-bottom:14px;">Error connecting to AI. Please try again.</p>
-                <button class="btn-primary" style="width:auto;padding:10px 20px;" onclick="generateRoadmap()">↻ Try Again</button>
-            </div>`;
+        if (e.name === "AbortError") {
+            showError(
+                "The request timed out.",
+                "The backend may be cold-starting or the AI call is taking longer than usual. Try again — it's often faster the second time."
+            );
+        } else {
+            showError(
+                "Error connecting to AI.",
+                "Check that the backend is running and reachable, then try again."
+            );
+        }
     } finally {
         clearTimeout(coldStartTimer);
         btn.disabled = false;
