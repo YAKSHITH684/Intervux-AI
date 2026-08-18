@@ -13,7 +13,7 @@
 ═══════════════════════════════════════ -->
 <script>
 (function warmBackend() {
-  fetch("https://intervux-ai-10.onrender.com/ping").catch(function () {});
+  fetch("https://intervux-ai.onrender.com/ping").catch(function () {});
 })();
 </script>
 
@@ -290,7 +290,14 @@ Respond ONLY with valid JSON, no markdown:
 
         let analysis;
         try {
-            const clean = data.reply.replace(/```json/g,"").replace(/```/g,"").trim();
+            let clean = data.reply.replace(/```json/g,"").replace(/```/g,"").trim();
+            // The assistant endpoint uses a conversational system prompt, so the model
+            // sometimes wraps the JSON in a sentence or two. Pull out just the {...} block.
+            const jsonStart = clean.indexOf("{");
+            const jsonEnd = clean.lastIndexOf("}");
+            if (jsonStart !== -1 && jsonEnd !== -1 && jsonEnd > jsonStart) {
+                clean = clean.slice(jsonStart, jsonEnd + 1);
+            }
             analysis = JSON.parse(clean);
         } catch(e) {
             content.innerHTML = `<div style="padding:20px;color:var(--coral);text-align:center;">AI response could not be parsed. Please try again.</div>`;
