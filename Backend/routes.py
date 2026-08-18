@@ -99,6 +99,18 @@ def ping():
     return {"status": "awake"}
 
 
+# TEMPORARY DEBUG ROUTE — remove after confirming the key loads.
+# Never returns the actual key value, just whether it's present and its length.
+@router.get("/debug-env")
+def debug_env():
+    key = os.getenv("GROQ_API_KEY")
+    return {
+        "key_found": key is not None,
+        "key_length": len(key) if key else 0,
+        "key_prefix": key[:5] if key else None
+    }
+
+
 # ─────────────────────────────────────────
 # AUTH
 # ─────────────────────────────────────────
@@ -596,7 +608,7 @@ def assistant(data: AssistantRequest):
 
     if not reply:
         if any(w in msg for w in ["hi", "hello", "hey"]):
-            reply = "Hello! I am your AI Intervux Assistant. Ask me about interview tips, resume advice, or practice questions!"
+            reply = "Hello! I am your AI Interview Assistant. Ask me about interview tips, resume advice, or practice questions!"
         elif any(w in msg for w in ["thank", "thanks"]):
             reply = "You are welcome! Best of luck with your interview. You have got this!"
         elif any(w in msg for w in ["interview", "prepare", "preparation"]):
