@@ -18,8 +18,17 @@ GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
 GROQ_MODEL = "openai/gpt-oss-120b"
 
 
-def ask_groq(system: str, messages: list, max_tokens: int = 300) -> str:
-    """Non-streaming call — still used by resume analysis, practice feedback, and the assistant chatbot."""
+def ask_groq(system: str, messages: list, max_tokens: int = 300, timeout: int = 15, json_mode: bool = False) -> str:
+    """Non-streaming call — used by resume analysis, practice feedback, the assistant
+    chatbot, skill-gap, job-matching, and the career roadmap.
+
+    timeout: override the default 15s for calls that need a longer completion
+             (e.g. the roadmap generator, which asks for ~2000+ tokens of JSON).
+    json_mode: when True, sets response_format={"type":"json_object"} so Groq
+               enforces valid JSON output and never prepends explanatory text.
+               Only use this with a system prompt that describes a JSON schema —
+               Groq requires the word "json" to appear in the prompt when this is set.
+    """
     if not GROQ_API_KEY:
         print("GROQ: No API key found in environment")
         return None
@@ -29,11 +38,13 @@ def ask_groq(system: str, messages: list, max_tokens: int = 300) -> str:
             "max_tokens": max_tokens,
             "messages": [{"role": "system", "content": system}] + messages
         }
+        if json_mode:
+            payload["response_format"] = {"type": "json_object"}
         res = requests.post(
             GROQ_URL,
             headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
             json=payload,
-            timeout=15
+            timeout=timeout
         )
         print(f"GROQ STATUS: {res.status_code} BODY: {res.text[:200]}")
         data = res.json()
@@ -817,6 +828,85 @@ Schema:
             print(f"Groq JSON parse error (skill-gap): {e}")
 
     return {"success": False, **_fallback_skill_gap(data.current_skills)}
+
+
+# ─────────────────────────────────────────
+# CAREER ROADMAP
+# ─────────────────────────────────────────
+class CareerRoadmapRequest(BaseModel):
+    job_role: str
+    start_level: str = "complete beginner with no experience"
+
+
+def _fallback_career_roadmap(job_role: str) -> dict:
+    return {
+        "role": job_role,
+        "overview": "AI analysis is temporarily unavailable, so this is a placeholder — try again shortly for a personalized roadmap.",
+        "job_outlook": {"demand_level": "Medium", "growth_trend": "", "top_hiring_companies": []},
+        "stages": [
+            {"stage": "Entry Level", "timeframe": "0-1 years", "avg_salary": "", "core_skills": [], "tools": [], "certifications": [], "milestone": ""},
+        ],
+        "learning_resources": [],
+        "alternative_roles": [],
+        "closing_advice": "",
+    }
+
+
+CAREER_ROADMAP_SYSTEM = """You are an expert career counselor who has mapped career paths for thousands of professionals across every tech and non-tech job role. Respond ONLY with valid JSON, no markdown, no explanation, no text before or after the JSON object. The JSON must be complete and syntactically valid - do not stop partway through.
+Schema:
+{
+  "role": "string",
+  "overview": "max 2 sentences: what this path looks like and realistic total time to senior/expert level",
+  "job_outlook": {
+    "demand_level": "High, Medium, or Low",
+    "growth_trend": "max 1 sentence",
+    "top_hiring_companies": ["company1","company2","company3"]
+  },
+  "stages": [
+    {"stage":"Entry Level","timeframe":"e.g. 0-1 years","avg_salary":"short approximate range","core_skills":["up to 6, most important first"],"tools":["tool1","tool2"],"certifications":["cert1"],"milestone":"max 1 sentence"},
+    {"stage":"Junior / Associate","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."},
+    {"stage":"Mid Level","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."},
+    {"stage":"Senior Level","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."},
+    {"stage":"Lead / Principal / Expert","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."}
+  ],
+  "learning_resources": [{"name":"resource name","type":"course/book/platform/community","note":"max 1 short sentence"}],
+  "alternative_roles": ["related role 1","related role 2","related role 3"],
+  "closing_advice": "max 2 sentences"
+}
+Limit "learning_resources" to at most 3 items. Do not add keys beyond this schema. The roadmap must work for ANY job role given (technical, creative, business, healthcare, etc.), not just software jobs."""
+
+
+@router.post("/career-roadmap")
+def career_roadmap(data: CareerRoadmapRequest):
+    """Dedicated roadmap-generation endpoint — JSON-mode + strict schema prompt +
+    generous token budget + longer HTTP timeout, so the 5-stage roadmap never gets
+    truncated (unlike reusing the conversational /assistant endpoint, which is
+    capped at 400 tokens and a 15s timeout)."""
+    import json as _json
+
+    user_content = f"Target Job Role: {data.job_role}\nStarting Point: {data.start_level}"
+
+    ai_reply = ask_groq(
+        CAREER_ROADMAP_SYSTEM,
+        [{"role": "user", "content": user_content}],
+        max_tokens=3000,
+        timeout=45,
+        json_mode=True,
+    )
+
+    if ai_reply:
+        try:
+            clean = ai_reply.replace("```json", "").replace("```", "").strip()
+            jstart, jend = clean.find("{"), clean.rfind("}")
+            if jstart != -1 and jend != -1 and jend > jstart:
+                clean = clean[jstart:jend + 1]
+            result = _json.loads(clean)
+            return {"success": True, **result}
+        except Exception as e:
+            print(f"Groq JSON parse error (career-roadmap): {e}")
+            print(f"Raw reply that failed to parse: {ai_reply[:500]}")
+
+    return {"success": False, **_fallback_career_roadmap(data.job_role)}
 
 
 @router.post("/match-job")

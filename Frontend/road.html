@@ -10,13 +10,6 @@
      with everything else, so Render's container
      + Groq connection are already awake by the
      time "Generate AI Career Roadmap" is clicked.
-
-     FIX: this now pings the SAME backend that
-     /assistant actually runs on. Previously this
-     warmed "intervux-ai-10.onrender.com" while the
-     real call went to "intervux-ai.onrender.com" —
-     two different Render services — so the real
-     backend was always cold on first request.
 ═══════════════════════════════════════ -->
 <script>
 (function warmBackend() {
@@ -233,78 +226,6 @@ function quickFill(role) {
     generateRoadmap();
 }
 
-// ---------- Robust JSON parsing ----------
-function parseRoadmapJSON(raw) {
-    if (!raw || typeof raw !== "string") return null;
-
-    // 1) Strip markdown code fences and surrounding whitespace
-    let clean = raw.replace(/```json/gi, "").replace(/```/g, "").trim();
-
-    // 2) Isolate the outermost {...} block in case the model added any preamble/trailing text
-    const start = clean.indexOf("{");
-    const end = clean.lastIndexOf("}");
-    if (start !== -1 && end !== -1 && end > start) {
-        clean = clean.slice(start, end + 1);
-    }
-
-    // 3) Try a straight parse first
-    try {
-        return JSON.parse(clean);
-    } catch (e1) {
-        // 4) Attempt light repairs for common model formatting slips, then retry
-        let repaired = clean
-            .replace(/,\s*([}\]])/g, "$1")   // trailing commas before } or ]
-            .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, ""); // stray control chars
-
-        try {
-            return JSON.parse(repaired);
-        } catch (e2) {
-            // 5) Last resort: the response may have been cut off mid-object
-            // (e.g. a backend token/length limit). Try to close it out.
-            const closed = closeTruncatedJSON(repaired);
-            try {
-                return JSON.parse(closed);
-            } catch (e3) {
-                return null;
-            }
-        }
-    }
-}
-
-// Closes a JSON string that was cut off partway through: finishes any open
-// string, drops a dangling trailing comma, then closes open [ and { in the
-// correct (reverse) order.
-function closeTruncatedJSON(str) {
-    let inString = false, escape = false;
-    const stack = [];
-
-    for (let i = 0; i < str.length; i++) {
-        const ch = str[i];
-        if (inString) {
-            if (escape) { escape = false; }
-            else if (ch === "\\") { escape = true; }
-            else if (ch === '"') { inString = false; }
-            continue;
-        }
-        if (ch === '"') { inString = true; }
-        else if (ch === "{" || ch === "[") { stack.push(ch); }
-        else if (ch === "}" || ch === "]") { stack.pop(); }
-    }
-
-    let result = str;
-    if (inString) result += '"';           // finish an unterminated string
-    result = result.replace(/,\s*$/, "");  // drop a trailing comma left dangling
-
-    // If the string ends right after a key's colon, or after a dangling key
-    // with no value at all, that's unrecoverable structurally — but we still
-    // attempt bracket closure so JSON.parse gives a clean failure rather than
-    // silently producing garbage.
-    for (let i = stack.length - 1; i >= 0; i--) {
-        result += stack[i] === "{" ? "}" : "]";
-    }
-    return result;
-}
-
 function matchSkills(list, haveArr) {
     return (list||[]).map(skill => {
         const isHave = haveArr.some(h => skill.toLowerCase().includes(h) || h.includes(skill.toLowerCase()));
@@ -353,68 +274,26 @@ async function generateRoadmap() {
     }, 7000);
 
     try {
-        // Kept deliberately compact: fewer core_skills per stage means a
-        // shorter completion, which means far less chance of the response
-        // getting cut off mid-JSON on a slow/cold backend.
-        const prompt = `You are an expert career counselor who has mapped career paths for thousands of professionals across every tech and non-tech job role.
-
-Build a concise career roadmap for:
-- Target Job Role: ${jobRole}
-- Starting Point: ${startLevel}
-
-The roadmap must work for ANY job role given (technical, creative, business, healthcare, etc.), not just software jobs.
-
-Keep every text field SHORT (see word limits below) so the full response stays compact. For each stage, list up to 6 core_skills (fewer only if the role genuinely doesn't need that many), ordered most-important first, using short skill names (1-3 words each). Output ONLY the JSON object below, with no markdown fences, no preamble, and no text after it. The JSON must be complete and syntactically valid — do not stop partway through, and keep the ENTIRE response under 1800 words.
-
-{
-  "role": "${jobRole}",
-  "overview": "max 2 sentences: what this path looks like and realistic total time to senior/expert level",
-  "job_outlook": {
-    "demand_level": "High, Medium, or Low",
-    "growth_trend": "max 1 sentence",
-    "top_hiring_companies": ["company1","company2","company3"]
-  },
-  "stages": [
-    {
-      "stage": "Entry Level",
-      "timeframe": "e.g. 0-1 years",
-      "avg_salary": "short approximate range for the given region, or global estimate if none given",
-      "core_skills": ["skill1","skill2","skill3","skill4","skill5","skill6"],
-      "tools": ["tool1","tool2"],
-      "certifications": ["cert1"],
-      "milestone": "max 1 sentence: how to know you're ready for the next stage"
-    },
-    {"stage":"Junior / Associate","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."},
-    {"stage":"Mid Level","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."},
-    {"stage":"Senior Level","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."},
-    {"stage":"Lead / Principal / Expert","timeframe":"...","avg_salary":"...","core_skills":["..."],"tools":["..."],"certifications":["..."],"milestone":"..."}
-  ],
-  "learning_resources": [
-    {"name":"resource name","type":"course/book/platform/community","note":"max 1 short sentence"}
-  ],
-  "alternative_roles": ["related role 1","related role 2","related role 3"],
-  "closing_advice": "max 2 sentences of practical advice"
-}
-
-Limit "learning_resources" to at most 3 items total. Do not add any keys beyond what's shown above.`;
-
-        const res = await fetchWithTimeout(`${BACKEND}/assistant`, {
-            method:"POST", headers:{"Content-Type":"application/json"},
-            body: JSON.stringify({ message: prompt, history: [] })
+        // Dedicated backend endpoint — sends only the two form values and gets
+        // back already-parsed JSON (schema, token budget, and JSON-mode are all
+        // enforced server-side, so there's no client-side string parsing here).
+        const res = await fetchWithTimeout(`${BACKEND}/career-roadmap`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ job_role: jobRole, start_level: startLevel })
         }, REQUEST_TIMEOUT_MS);
 
         if (!res.ok) {
             throw new Error(`Server responded with status ${res.status}`);
         }
 
-        const data = await res.json();
+        const roadmap = await res.json();
 
-        const roadmap = parseRoadmapJSON(data.reply);
-        if (!roadmap) {
-            console.error("Raw AI reply that failed to parse:", data.reply);
+        if (!roadmap || roadmap.success === false) {
+            console.error("Roadmap generation failed on the backend:", roadmap);
             showError(
-                "The AI response couldn't be read this time.",
-                "This usually means the reply was cut off or malformed — often a cold-start or token-limit issue on the backend. Retrying almost always fixes it."
+                "The AI couldn't build a roadmap this time.",
+                "This usually means a temporary backend or AI-provider hiccup. Retrying almost always fixes it."
             );
             return;
         }
