@@ -15,7 +15,7 @@ router = APIRouter()
 
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 GROQ_URL = "https://api.groq.com/openai/v1/chat/completions"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 
 
 def ask_groq(system: str, messages: list, max_tokens: int = 300) -> str:
@@ -596,7 +596,7 @@ def assistant(data: AssistantRequest):
 
     if not reply:
         if any(w in msg for w in ["hi", "hello", "hey"]):
-            reply = "Hello! I am your AI Interview Assistant. Ask me about interview tips, resume advice, or practice questions!"
+            reply = "Hello! I am your AI Intervux Assistant. Ask me about interview tips, resume advice, or practice questions!"
         elif any(w in msg for w in ["thank", "thanks"]):
             reply = "You are welcome! Best of luck with your interview. You have got this!"
         elif any(w in msg for w in ["interview", "prepare", "preparation"]):
