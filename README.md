@@ -400,7 +400,7 @@ GitHub: [@YAKSHITH684](https://github.com/YAKSHITH684)
 
 Built with ❤️ using FastAPI, JavaScript, SQLite, Groq AI, Llama 3.3, and Render Cloud.
 
-<p align="center">⭐ If you find this project useful, consider giving it a star on GitHub!</p>
+⭐ If you find this project useful, consider giving it a star on GitHub!</p>
 
 ### Your Personal AI Interview Coach
 
