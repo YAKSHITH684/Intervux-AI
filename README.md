@@ -1,21 +1,53 @@
+
+
 # 🤖 Intervux AI
 
-> **An intelligent AI-powered interview preparation platform powered by Groq AI (Llama 3.3).**  
-> Analyze resumes, practice realistic AI interviews, receive personalized feedback, and track your career readiness — all in one platform.
+**An intelligent AI-powered interview preparation platform powered by Groq AI (Llama 3.3).**
+
+Analyze resumes, practice realistic AI interviews, receive personalized feedback, and track your career readiness — all in one platform.
+
+[![Live App](https://img.shields.io/badge/Live%20App-Online-brightgreen?style=for-the-badge)](https://intervux-ai-10.onrender.com/)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/YAKSHITH684/Intervux-AI)
+[![Python](https://img.shields.io/badge/Python-3.x-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![Groq](https://img.shields.io/badge/AI-Groq%20Llama%203.3-orange?style=for-the-badge)](https://groq.com/)
+
 
 ---
 
-# 🌐 Live Deployment
+## 📑 Table of Contents
 
-🚀 **Live Application:**  
-https://intervux-ai-10.onrender.com/
-
-📂 **GitHub Repository:**  
-https://github.com/YAKSHITH684/Intervux-AI
+- [Live Deployment](#-live-deployment)
+- [Project Overview](#-project-overview)
+- [Problem Statement](#-problem-statement)
+- [Solution](#-solution)
+- [Features](#-features)
+- [How Intervux AI Works](#-how-intervux-ai-works)
+- [AI Workflow](#-ai-workflow)
+- [AI Integration](#-ai-integration)
+- [Technology Stack](#️-technology-stack)
+- [Project Structure](#️-project-structure)
+- [Local Installation](#️-local-installation)
+- [API Endpoints](#-api-endpoints)
+- [Deployment](#️-deployment)
+- [Project Statistics](#-project-statistics)
+- [Why Intervux AI?](#-why-intervux-ai)
+- [Future Enhancements](#-future-enhancements)
+- [Contributing](#-contributing)
+- [License](#-license)
+- [Author](#-author)
 
 ---
 
-# 📌 Project Overview
+## 🌐 Live Deployment
+
+🚀 **Live Application:** [intervux-ai-10.onrender.com](https://intervux-ai-10.onrender.com/)
+
+📂 **GitHub Repository:** [github.com/YAKSHITH684/Intervux-AI](https://github.com/YAKSHITH684/Intervux-AI)
+
+---
+
+## 📌 Project Overview
 
 Intervux AI is an AI-powered interview preparation platform designed to help students, fresh graduates, and job seekers improve their interview skills.
 
@@ -25,7 +57,7 @@ Users can upload resumes, receive ATS analysis, practice AI-generated interviews
 
 ---
 
-# 🎯 Problem Statement
+## 🎯 Problem Statement
 
 Many students and job seekers struggle to perform well in interviews because they lack:
 
@@ -35,26 +67,24 @@ Many students and job seekers struggle to perform well in interviews because the
 - Confidence before interviews
 - Access to professional coaching
 
-Traditional preparation methods provide limited practice and do not identify individual weaknesses.
-
-Intervux AI solves this problem by providing an AI-powered personal interview coach available anytime.
+Traditional preparation methods provide limited practice and do not identify individual weaknesses. Intervux AI solves this problem by providing an AI-powered personal interview coach available anytime.
 
 ---
 
-# 💡 Solution
+## 💡 Solution
 
 Intervux AI provides an intelligent platform where candidates can:
 
-✅ Analyze their resume using AI  
-✅ Practice real-time AI mock interviews  
-✅ Receive personalized feedback  
-✅ Identify skill gaps  
-✅ Track interview readiness  
-✅ Improve confidence before real interviews  
+- ✅ Analyze their resume using AI
+- ✅ Practice real-time AI mock interviews
+- ✅ Receive personalized feedback
+- ✅ Identify skill gaps
+- ✅ Track interview readiness
+- ✅ Improve confidence before real interviews
 
 ---
 
-# ✨ Features
+## ✨ Features
 
 | Feature | Description |
 |---|---|
@@ -67,129 +97,81 @@ Intervux AI provides an intelligent platform where candidates can:
 
 ---
 
-# 🚀 How Intervux AI Works
+## 🚀 How Intervux AI Works
 
 ```
-Step 1:
-User uploads resume
-
+1. User uploads resume
         ↓
-
-Step 2:
-Resume parser extracts information
-
+2. Resume parser extracts information
         ↓
-
-Step 3:
-Groq AI analyzes resume
-
+3. Groq AI analyzes resume
         ↓
-
-Step 4:
-ATS score, skills, and suggestions generated
-
+4. ATS score, skills, and suggestions generated
         ↓
-
-Step 5:
-AI conducts mock interview
-
+5. AI conducts mock interview
         ↓
-
-Step 6:
-Answers are evaluated with feedback
-
+6. Answers are evaluated with feedback
         ↓
-
-Step 7:
-Progress and readiness are tracked
+7. Progress and readiness are tracked
 ```
 
 ---
 
-# 🧠 AI Workflow
+## 🧠 AI Workflow
 
-## Resume Intelligence
+**Resume Intelligence**
 
 ```
 Resume File
-      |
-      ↓
+     ↓
 PDF/DOCX Parser
-      |
-      ↓
+     ↓
 Text Extraction
-      |
-      ↓
+     ↓
 Groq Llama 3.3 AI
-      |
-      ↓
-ATS Score
-Skill Detection
-Strength Analysis
-Suggestions
+     ↓
+ATS Score · Skill Detection · Strength Analysis · Suggestions
 ```
 
----
-
-## AI Interview Engine
+**AI Interview Engine**
 
 ```
 Candidate Answer
-        |
-        ↓
+     ↓
 AI Interview System
-        |
-        ↓
+     ↓
 Response Understanding
-        |
-        ↓
+     ↓
 Performance Evaluation
-        |
-        ↓
+     ↓
 Personalized Feedback
 ```
 
 ---
 
-# 🤖 AI Integration
+## 🤖 AI Integration
 
-Intervux AI uses:
-
-**AI Provider:** Groq API  
+**AI Provider:** Groq API
 **AI Model:** Llama 3.3-70B-Versatile
 
-AI powers:
+AI powers three core areas:
 
-## 📄 Resume Analysis
-
+**📄 Resume Analysis**
 - Resume content extraction
 - ATS compatibility scoring
 - Skill identification
 - Strength analysis
 - Improvement recommendations
 
+**🎤 AI Interview Simulation**
 
-## 🎤 AI Interview Simulation
-
-Supports:
-
-- Technical Interviews
-- HR Interviews
-- System Design Interviews
-- DSA Interviews
-
-Provides:
-
+Supports Technical, HR, System Design, and DSA interviews, with:
 - Dynamic questions
 - Follow-up questions
 - Answer evaluation
 - Feedback generation
 
-
-## 💬 AI Assistant
-
-Provides:
-
+**💬 AI Assistant**
 - Interview preparation tips
 - Career guidance
 - Resume advice
@@ -197,45 +179,32 @@ Provides:
 
 ---
 
-# 🛠️ Technology Stack
+## 🛠️ Technology Stack
 
-## Frontend
-
-- HTML5
-- CSS3
-- JavaScript
+**Frontend**
+- HTML5, CSS3, JavaScript
 - Responsive Web Design
 - Glassmorphism UI
 - Render Static Hosting
 
-
-## Backend
-
-- Python 3
-- FastAPI
-- SQLAlchemy
-- SQLite Database
-- Groq API
-- Llama 3.3 AI Model
-- pdfplumber
-- python-docx
+**Backend**
+- Python 3, FastAPI
+- SQLAlchemy, SQLite Database
+- Groq API, Llama 3.3 AI Model
+- pdfplumber, python-docx
 - REST API Architecture
 
-
-## Deployment
-
+**Deployment**
 - Render Cloud Platform
 
 ---
 
-# 🗂️ Project Structure
+## 🗂️ Project Structure
 
 ```
-Intervux-AI
-
+Intervux-AI/
 │
-├── Frontend
-│
+├── Frontend/
 │   ├── login.html
 │   ├── register.html
 │   ├── dashboard.html
@@ -248,62 +217,34 @@ Intervux-AI
 │   ├── style.css
 │   └── script.js
 │
-│
-└── Backend
-     
+└── Backend/
     ├── app.py
     ├── routes.py
     ├── requirements.txt
-    │
-    └── database
-        
+    └── database/
         ├── database.py
         └── models.py
 ```
 
 ---
 
-# 📁 Local Project Location
+## ⚙️ Local Installation
 
-```
-C:\Users\yaksh\OneDrive\Doc\PROJECTS\Intervux-AI
-```
-
----
-
-# ⚙️ Local Installation
-
-## Clone Repository
+### Clone the repository
 
 ```bash
 git clone https://github.com/YAKSHITH684/Intervux-AI.git
-```
-
-Navigate into project:
-
-```bash
 cd Intervux-AI
 ```
 
----
-
-# 🔧 Backend Setup
-
-Go to backend folder:
+### Backend setup
 
 ```bash
 cd Backend
-```
-
-Create virtual environment:
-
-```bash
 python -m venv venv
 ```
 
-Activate environment:
-
-Windows:
+Activate the environment (Windows):
 
 ```bash
 venv\Scripts\activate
@@ -315,11 +256,9 @@ Install dependencies:
 pip install -r requirements.txt
 ```
 
----
+### Environment variables
 
-# 🔑 Environment Variables
-
-Add Groq API Key:
+Add your Groq API key.
 
 Windows:
 
@@ -333,37 +272,28 @@ Linux/Mac:
 export GROQ_API_KEY=your_groq_api_key_here
 ```
 
----
-
-# ▶️ Run Backend
+### Run backend
 
 ```bash
 uvicorn app:app --reload
 ```
 
-Backend runs:
+Backend runs at:
 
 ```
 http://127.0.0.1:8000
 ```
 
----
-
-# 🌐 Run Frontend
+### Run frontend
 
 Open another terminal:
 
 ```bash
 cd Frontend
-```
-
-Start frontend:
-
-```bash
 python -m http.server 5500
 ```
 
-Open browser:
+Open in browser:
 
 ```
 http://localhost:5500/login.html
@@ -371,7 +301,7 @@ http://localhost:5500/login.html
 
 ---
 
-# 📡 API Features
+## 📡 API Endpoints
 
 | Endpoint | Purpose |
 |---|---|
@@ -387,25 +317,14 @@ http://localhost:5500/login.html
 
 ---
 
-# ☁️ Deployment
+## ☁️ Deployment
 
-## Frontend
-
-Platform:
-
-```
-Render Static Site
-```
-
-Live URL:
-
-```
-https://intervux-ai-10.onrender.com/
-```
+**Platform:** Render Static Site
+**Live URL:** [intervux-ai-10.onrender.com](https://intervux-ai-10.onrender.com/)
 
 ---
 
-# 📊 Project Statistics
+## 📊 Project Statistics
 
 | Metric | Count |
 |---|---|
@@ -421,27 +340,26 @@ https://intervux-ai-10.onrender.com/
 
 ---
 
-# 🌟 Why Intervux AI?
+## 🌟 Why Intervux AI?
 
-Traditional interview preparation has challenges:
+Traditional interview preparation has real limitations:
 
-❌ Limited practice opportunities  
-❌ No personalized feedback  
-❌ Expensive coaching  
-❌ No resume improvement guidance  
+- ❌ Limited practice opportunities
+- ❌ No personalized feedback
+- ❌ Expensive coaching
+- ❌ No resume improvement guidance
 
+Intervux AI addresses each of these:
 
-Intervux AI provides:
-
-✅ AI-powered interview simulation  
-✅ Real-time feedback  
-✅ Resume intelligence  
-✅ Personalized preparation  
-✅ Career readiness tracking  
+- ✅ AI-powered interview simulation
+- ✅ Real-time feedback
+- ✅ Resume intelligence
+- ✅ Personalized preparation
+- ✅ Career readiness tracking
 
 ---
 
-# 🔮 Future Enhancements
+## 🔮 Future Enhancements
 
 - 🎙️ Voice-based AI interviews
 - 🎥 Video interview analysis
@@ -454,26 +372,35 @@ Intervux AI provides:
 
 ---
 
-# 👨‍💻 Author
+## 🤝 Contributing
 
-**Yakshith Anandapu**
+Contributions are welcome! If you'd like to improve Intervux AI:
 
-Built with ❤️ using:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/your-feature`)
+3. Commit your changes (`git commit -m "Add your feature"`)
+4. Push to the branch (`git push origin feature/your-feature`)
+5. Open a Pull Request
 
-```
-FastAPI
-JavaScript
-SQLite
-Groq AI
-Llama 3.3
-Render Cloud
-```
+For major changes, please open an issue first to discuss what you'd like to change.
 
 ---
 
-<p align="center">
+## 📄 License
 
-# 🚀 Intervux AI
+This project is currently unlicensed. If you plan to reuse or build on this code, please reach out to the author first, or add a license (e.g. MIT) if you intend to open it up for public use.
+
+---
+
+## 👨‍💻 Author
+
+**Yakshith Anandapu**
+
+GitHub: [@YAKSHITH684](https://github.com/YAKSHITH684)
+
+Built with ❤️ using FastAPI, JavaScript, SQLite, Groq AI, Llama 3.3, and Render Cloud.
+
+<p align="center">⭐ If you find this project useful, consider giving it a star on GitHub!</p>
 
 ### Your Personal AI Interview Coach
 
