@@ -5,7 +5,7 @@
       <img src="https://res.cloudinary.com/dfzdsdoa5/image/upload/v1781798675/ai_obxb2v.png" width="160" alt="Intervux AI Logo">
     </td>
     <td valign="middle">
-      <h1>🤖 Intervux AI</h1>
+      <h1> Intervux AI</h1>
       <h3>Your Personal AI Interview Coach</h3>
       <p><strong>Prepare Smarter • Practice Better • Get Hired</strong></p>
       <p>Analyze your resume, practice AI-powered mock interviews, receive personalized feedback, and track your career readiness.</p>
