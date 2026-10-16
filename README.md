@@ -1,9 +1,17 @@
 
-#  Intervux AI — Your Personal AI Interview Coach
-
-**Prepare Smarter. Practice Better. Get Hired.**
-
-Intervux AI is an AI-powered interview preparation platform that helps students, fresh graduates, and job seekers become interview-ready through intelligent resume analysis, realistic mock interviews, personalized feedback, and career progress tracking.
+<table>
+  <tr>
+    <td width="180" align="center" valign="middle">
+      <img src="https://res.cloudinary.com/dfzdsdoa5/image/upload/v1781798675/ai_obxb2v.png" width="160" alt="Intervux AI Logo">
+    </td>
+    <td valign="middle">
+      <h1>🤖 Intervux AI</h1>
+      <h3>Your Personal AI Interview Coach</h3>
+      <p><strong>Prepare Smarter • Practice Better • Get Hired</strong></p>
+      <p>Analyze your resume, practice AI-powered mock interviews, receive personalized feedback, and track your career readiness.</p>
+    </td>
+  </tr>
+</table>
 
 <p align="center">
   <a href="https://intervux-ai-10.onrender.com/01_login.html"><strong>🚀 Try Live App</strong></a>
