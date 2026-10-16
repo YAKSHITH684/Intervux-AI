@@ -1,5 +1,5 @@
 
-# 🤖 Intervux AI — Your Personal AI Interview Coach
+#  Intervux AI — Your Personal AI Interview Coach
 
 **Prepare Smarter. Practice Better. Get Hired.**
 
